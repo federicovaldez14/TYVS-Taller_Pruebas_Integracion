@@ -1,7 +1,0 @@
-# Integrantes del equipo — Taller de Pruebas de Integración y Sistema
-
-> COMPLETAR antes de entregar: reemplace estos datos por los del equipo real.
-> Formato: Nombre completo | correo institucional
-
-Nombre Apellido 1 | nombre.apellido1@unisabana.edu.co
-Nombre Apellido 2 | nombre.apellido2@unisabana.edu.co
