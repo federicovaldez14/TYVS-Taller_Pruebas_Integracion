@@ -1,135 +1,63 @@
-# Registro de Defectos — EJEMPLO RESUELTO
+# Registro de Defectos — Taller de Pruebas de Integración y Sistema
 
-> **Este archivo es un ejemplo del profesor**, no su entrega. Muestra el ciclo de vida completo de un defecto: detectado, analizado y cerrado con la prueba que lo verifica.
-> Para su taller parta de [`defectos_template.md`](defectos_template.md) y documente los defectos que **usted** encuentre.
-
-Este documento recopila los **defectos detectados durante las pruebas unitarias, de integración y de sistema** del proyecto **Registraduría**.
-Cada defecto se documenta de manera estructurada para facilitar su análisis, trazabilidad y corrección.
+> Este documento sigue el formato de `defectos_template.md`. El archivo
+> `defectos.md` original del profesor (marcado "EJEMPLO RESUELTO") se
+> conserva como referencia pedagógica; este es el registro propio del
+> equipo, obtenido al ejecutar la suite de pruebas del proyecto.
 
 ---
 
 ## Formato 1: Lista detallada (narrativa)
 
-### Defecto 01 — Falta de validación de edad negativa *(Prueba unitaria)*
+### Defecto 01 — El mismo SQL no es portable entre H2 y PostgreSQL
 
-- **Capa afectada:** Dominio (`Registry.registerVoter`)
-- **Caso de prueba:** Registro de persona con edad `-1`.
-- **Entrada:**
-`Person(name="Juan", id=101, age=-1, gender=MALE, alive=true)`
-- **Resultado esperado:** `INVALID_AGE` (una edad negativa es un dato imposible, no una persona menor)
-- **Resultado obtenido:** `UNDERAGE`
-- **Causa probable:** `Registry` evaluaba `age < MIN_AGE` sin distinguir entre "menor de edad" y "edad imposible". Una edad de `-1` caía en la misma rama que una de `17`.
-- **Tipo de prueba:** Unitaria (dominio puro)
-- **Estado:** **Resuelto** — se añadió `INVALID_AGE` al enum y la regla `age < 0 || age > MAX_AGE` **antes** de la de menor de edad. Verificado por `RegistryWithMockTest.shouldReturnInvalidAgeWhenAgeIsNegative()` y `shouldReturnInvalidAgeWhenAgeExceedsMaximum()`.
-- **Prioridad:** Alta
-
-> **Por qué no era un detalle cosmético.** Las dos clases de equivalencia se parecen en el código y no se parecen en nada para quien usa el sistema: a una persona de 17 años se le dice *"espere a cumplir 18"*, mientras que un registro con `-1` significa que **alguien capturó mal el dato** y hay que corregirlo. Devolver `UNDERAGE` en ambos casos le da al segundo un consejo inútil.
->
-> El orden de las dos comprobaciones también importa. Si se pregunta primero `age < MIN_AGE`, el `-1` entra por esa rama y `INVALID_AGE` queda inalcanzable — el enum tendría la constante y el sistema no la usaría nunca.
->
-> Este defecto era además una **inconsistencia entre talleres**: el de pruebas unitarias ya distinguía los dos casos y este no, de modo que la misma Registraduría se comportaba distinto según el taller desde el que se mirara. Los dos describen ahora el mismo dominio.
-
-**Valor límite asociado:** la frontera entre las dos clases es la **edad 0** — un año menos es imposible, y `0` es el dato correcto de un recién nacido que no puede votar. Está cubierta por `RegistryWithMockTest.shouldReturnUnderageWhenAgeIsZero()`. Sin esa prueba, cambiar `< 0` por `<= 0` no rompe nada y la mutación sobrevive.
-
----
-
-### Defecto 02 — Registro de persona fallecida *(Prueba unitaria)*
-
-- **Capa afectada:** Dominio (`Registry.registerVoter`)
-- **Caso de prueba:** Persona con `alive=false`.
-- **Entrada:**
-`Person(name="Ana", id=102, age=45, gender=FEMALE, alive=false)`
-- **Resultado esperado:** `DEAD`
-- **Resultado obtenido:** `VALID`
-- **Causa probable:** No se valida correctamente la condición `alive=false`.
-- **Tipo de prueba:** Unitaria (regla de negocio)
-- **Estado:** **Resuelto** — `Registry.registerVoter` evalúa `if (!p.isAlive()) return RegisterResult.DEAD;`. Verificado por `RegistryWithMockTest.shouldReturnDeadWhenPersonIsNotAlive()`.
-- **Prioridad:** Media
-
----
-
-### Defecto 03 — No se detectan duplicados *(Prueba de integración con H2)*
-
-- **Capa afectada:** Infraestructura (`RegistryRepository`)
-- **Caso de prueba:** Dos registros con el mismo `id`.
-- **Entradas:**
-  - Persona 1 → `Person(name="Carlos", id=200, age=30, gender=MALE, alive=true)`
-  - Persona 2 → `Person(name="Carla", id=200, age=25, gender=FEMALE, alive=true)`
-- **Resultado esperado:**
-  - Persona 1 → `VALID`
-  - Persona 2 → `DUPLICATED`
+- **Caso de prueba:** `RegistryRepositoryPostgresIT.shouldResolveQuotedLowercaseIdentifier()`
+- **Entrada:** Se crea la tabla `registry` con la misma sentencia `CREATE TABLE` en H2 y en PostgreSQL (Testcontainers), y se ejecuta la consulta `SELECT "name" FROM registry WHERE id = 400` contra ambos motores.
+- **Resultado esperado:** La consulta debería comportarse igual en ambos motores, ya que el esquema se crea con el mismo DDL.
 - **Resultado obtenido:**
-  - Persona 1 → `VALID`
-  - Persona 2 → `VALID`
-- **Causa probable:** El método `existsById()` del repositorio no verifica correctamente la existencia previa del registro.
-- **Tipo de prueba:** Integración (H2 + capa de aplicación)
-- **Estado:** **Resuelto** — `RegistryRepository.existsById` consulta la tabla antes de insertar. Verificado por `RegistryIT.shouldPersistValidVoterAndRejectDuplicates()` (H2) y `RegistryRepositoryPostgresIT.shouldPersistAndRejectDuplicate()` (PostgreSQL real).
-- **Prioridad:** Alta
+  - PostgreSQL: `OK`, devuelve `Ana`.
+  - H2: falla con `Columna "name" no encontrada`.
+- **Causa probable:** El estándar SQL no define a qué caja se pliegan los identificadores sin comillas. H2 los pliega a MAYÚSCULAS (la columna queda como `NAME`) y PostgreSQL los pliega a minúsculas (queda como `name`). Un identificador entrecomillado se toma literal, así que `"name"` solo coincide en PostgreSQL.
+- **Tipo de prueba:** Integración con base de datos real (Testcontainers)
+- **Estado:** **Cerrado — comportamiento documentado.** No es un bug del código propio, sino una divergencia real de motores. Se decidió **no usar identificadores entrecomillados en minúsculas** en el código de producción (`RegistryRepository` usa `SELECT id, name, age, is_alive ...` sin comillas), precisamente para evitar depender de un plegado de mayúsculas/minúsculas específico de un motor.
+- **Evidencia:** log de ejecución de `mvn verify` con Docker activo, sección de `RegistryRepositoryPostgresIT`.
+- **Prioridad:** Media (no bloqueante hoy, pero de alto impacto si alguien añade una consulta con identificadores entrecomillados sin conocer esta diferencia).
 
 ---
 
-### Defecto 04 — Fallo en simulación con mock *(Prueba de integración con Mockito)*
+### Defecto 02 — Un cambio en el formato de respuesta del proveedor rompe al consumidor sin que la prueba de sistema lo detecte
 
-- **Capa afectada:** Aplicación (`Registry`)
-- **Caso de prueba:** Registro con `id` duplicado en un repositorio simulado.
-- **Configuración:**
-
-```java
-when(repo.existsById(7)).thenReturn(true);
-```
-
-- **Resultado esperado:** `DUPLICATED`
-- **Resultado obtenido:** `NullPointerException`
-- **Causa probable:** Dependencia `RegistryRepositoryPort` no inicializada correctamente durante el mock.
-- **Tipo de prueba:** Integración (mock)
-- **Estado:** **Resuelto** — el escenario funciona; `RegistryWithMockTest.shouldWrapPersistenceFailure()` verifica que el fallo del puerto se traduce a `RegistryPersistenceException`.
-- **Prioridad:** Media
-
----
-
-### Defecto 05 — Error HTTP 500 no manejado *(Prueba de sistema REST)*
-
-- **Capa afectada:** Delivery (`RegistryController`)
-- **Caso de prueba:** Envío de JSON con campo `gender` inválido.
-- **Entrada:**
-
-```json
-{ "name": "Laura", "id": 500, "age": 20, "gender": "OTHER", "alive": true }
-```
-
-- **Resultado esperado:** `HTTP 400` (Bad Request)
-- **Resultado obtenido:** `HTTP 500` (Internal Server Error)
-- **Causa probable:** Falta de validación o manejo de excepción `IllegalArgumentException` en el controlador.
-- **Tipo de prueba:** Sistema (TestRestTemplate)
-- **Estado:** **Resuelto** — `RegistryExceptionHandler` traduce `IllegalArgumentException` a **400 Bad Request**: un género fuera del enum es error del cliente, no del servidor. Verificado por `RegistryControllerIT.shouldReturnBadRequestWhenGenderIsNotValid()`.
-- **Prioridad:** Alta
+- **Caso de prueba:** ejercicio guiado del taller ("Compruébelo usted mismo" de la sección de Pact).
+- **Pasos para reproducir:**
+  1. En `RegistryController.register(...)`, se cambió temporalmente `return r.name();` por `return "{\"resultado\":\"" + r.name() + "\"}";`.
+  2. Se actualizó también la aserción de `RegistryControllerIT.shouldRegisterValidPerson()` para que esperara ese nuevo JSON.
+  3. Se ejecutó `mvn clean verify`.
+- **Resultado esperado:** Si el consumidor (`certificados`) sigue esperando texto plano (`"VALID"`), algún mecanismo de prueba debería detectar la ruptura del contrato antes de llegar a producción.
+- **Resultado obtenido:**
+  - `RegistryControllerIT` (prueba de sistema): **sigue en verde**, porque se actualizó junto con el código — verifica al proveedor contra sí mismo.
+  - `RegistraduriaProviderPactIT` (verificación del pacto): **falla**, porque el pacto generado por el consumidor sigue exigiendo el cuerpo `"VALID"` en texto plano.
+- **Causa probable:** Ninguna prueba interna del proveedor conoce las expectativas reales del consumidor; solo el contrato (pacto) las captura.
+- **Tipo de prueba:** Contract testing (Pact) vs. prueba de sistema (HTTP)
+- **Estado:** **Resuelto.** Se revirtió el cambio en `RegistryController` y se confirmó que `mvn clean verify` vuelve a estar en verde, incluida la verificación del pacto.
+- **Evidencia:** salida de consola de Maven mostrando `Verifying a pact between certificados and registraduria ... FAILED` antes de revertir, y `PASSED` después.
+- **Prioridad:** Alta — es exactamente el tipo de defecto que llega a producción cuando cada equipo solo prueba su propia parte.
 
 ---
 
 ## Formato 2: Tabla de defectos (bug tracking)
 
-| ID | Caso de Prueba | Capa | Resultado Esperado | Resultado Obtenido | Tipo | Estado | Prioridad |
-|----|----------------|------|--------------------|--------------------|------|----------|------------|
-| 01 | Edad negativa | Dominio | `INVALID_AGE` | `UNDERAGE` | Unitaria | Resuelto | Alta |
-| 02 | Persona muerta | Dominio | `DEAD` | `VALID` | Unitaria | Resuelto | Media |
-| 03 | Duplicado por ID | Infraestructura | `DUPLICATED` | `VALID` | Integración | Resuelto | Alta |
-| 04 | Fallo de persistencia | Aplicación | `RegistryPersistenceException` | `NullPointerException` | Unitaria (mock) | Resuelto | Media |
-| 05 | Error HTTP 500 | Delivery | `HTTP 400` | `HTTP 500` | Sistema (REST) | Resuelto | Alta |
+| ID | Caso de Prueba | Entrada | Resultado Esperado | Resultado Obtenido | Causa Probable | Estado |
+|----|-----------------|---------|---------------------|----------------------|------------------|--------|
+| 01 | `SELECT "name"` contra H2 y PostgreSQL | mismo DDL, mismo SELECT | comportamiento igual en ambos motores | falla en H2, funciona en PostgreSQL | plegado de identificadores no estandarizado por SQL | Cerrado — documentado |
+| 02 | Cambiar el body de `/register` a JSON | proveedor cambia texto plano por JSON | alguna prueba detecta la ruptura de contrato | `RegistryControllerIT` no lo detecta; `RegistraduriaProviderPactIT` sí | pruebas de sistema verifican al proveedor contra sí mismo, no contra el consumidor real | Resuelto (revertido) |
 
 ---
 
 ## Convenciones de Estado
 
 | Estado | Significado |
-|---------|-------------|
+|--------|-------------|
 | **Abierto** | El defecto fue detectado pero no corregido. |
 | **En progreso** | El defecto se encuentra en análisis o corrección. |
 | **Resuelto** | El defecto fue corregido y validado mediante pruebas. |
-
----
-
-## Observaciones
-
-- Los defectos detectados evidencian la importancia de **mantener pruebas unitarias robustas** antes de pasar a integración.
-- La validación cruzada entre pruebas con mocks e integración real (H2) permitió identificar inconsistencias en el flujo de persistencia.
-- Los errores en las pruebas REST destacan la necesidad de implementar **manejadores globales de excepciones (ControllerAdvice)** para mejorar la estabilidad del sistema.
+| **Cerrado — documentado** | No es un defecto de código, sino un comportamiento divergente que se decidió documentar y evitar por diseño. |

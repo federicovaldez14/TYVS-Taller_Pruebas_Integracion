@@ -1,0 +1,15 @@
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/main/java/edu/unisabana/tyvs/certificados/CertificadoService.java
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/main/java/edu/unisabana/tyvs/certificados/RegistraduriaClient.java
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/main/java/edu/unisabana/tyvs/registry/RegistryApplication.java
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/main/java/edu/unisabana/tyvs/registry/application/port/out/RegistryRepositoryPort.java
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/main/java/edu/unisabana/tyvs/registry/application/usecase/Registry.java
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/main/java/edu/unisabana/tyvs/registry/application/usecase/RegistryPersistenceException.java
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/main/java/edu/unisabana/tyvs/registry/config/RegistryConfig.java
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/main/java/edu/unisabana/tyvs/registry/delivery/rest/RegistryController.java
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/main/java/edu/unisabana/tyvs/registry/delivery/rest/RegistryExceptionHandler.java
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/main/java/edu/unisabana/tyvs/registry/domain/model/Gender.java
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/main/java/edu/unisabana/tyvs/registry/domain/model/Person.java
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/main/java/edu/unisabana/tyvs/registry/domain/model/RegisterResult.java
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/main/java/edu/unisabana/tyvs/registry/domain/model/rq/PersonDTO.java
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/main/java/edu/unisabana/tyvs/registry/infrastructure/persistence/RegistryRecord.java
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/main/java/edu/unisabana/tyvs/registry/infrastructure/persistence/RegistryRepository.java

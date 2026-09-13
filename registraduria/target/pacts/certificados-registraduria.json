@@ -1,0 +1,70 @@
+{
+  "consumer": {
+    "name": "certificados"
+  },
+  "interactions": [
+    {
+      "description": "un registro de votante valido",
+      "providerStates": [
+        {
+          "name": "no hay ningun votante registrado con id 900"
+        }
+      ],
+      "request": {
+        "body": {
+          "age": 30,
+          "alive": true,
+          "gender": "FEMALE",
+          "id": 900,
+          "name": "Ana"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "method": "POST",
+        "path": "/register"
+      },
+      "response": {
+        "body": "VALID",
+        "status": 200
+      }
+    },
+    {
+      "description": "un registro de votante repetido",
+      "providerStates": [
+        {
+          "name": "ya existe un votante registrado con id 901"
+        }
+      ],
+      "request": {
+        "body": {
+          "age": 40,
+          "alive": true,
+          "gender": "MALE",
+          "id": 901,
+          "name": "Luis"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "method": "POST",
+        "path": "/register"
+      },
+      "response": {
+        "body": "DUPLICATED",
+        "status": 200
+      }
+    }
+  ],
+  "metadata": {
+    "pact-jvm": {
+      "version": "4.6.14"
+    },
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  },
+  "provider": {
+    "name": "registraduria"
+  }
+}

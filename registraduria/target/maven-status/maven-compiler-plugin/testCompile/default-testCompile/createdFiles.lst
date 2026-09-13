@@ -1,0 +1,6 @@
+edu/unisabana/tyvs/registry/application/usecase/RegistryWithMockTest.class
+edu/unisabana/tyvs/registry/infrastructure/persistence/RegistryRepositoryPostgresIT.class
+edu/unisabana/tyvs/registry/delivery/rest/RegistraduriaProviderPactIT.class
+edu/unisabana/tyvs/registry/delivery/rest/RegistryControllerIT.class
+edu/unisabana/tyvs/registry/application/usecase/RegistryIT.class
+edu/unisabana/tyvs/certificados/CertificadoServicePactTest.class

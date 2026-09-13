@@ -1,0 +1,6 @@
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/test/java/edu/unisabana/tyvs/certificados/CertificadoServicePactTest.java
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/test/java/edu/unisabana/tyvs/registry/application/usecase/RegistryIT.java
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/test/java/edu/unisabana/tyvs/registry/application/usecase/RegistryWithMockTest.java
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/test/java/edu/unisabana/tyvs/registry/delivery/rest/RegistraduriaProviderPactIT.java
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/test/java/edu/unisabana/tyvs/registry/delivery/rest/RegistryControllerIT.java
+/mnt/j/TYVS-Taller_Pruebas_Integracion/registraduria/src/test/java/edu/unisabana/tyvs/registry/infrastructure/persistence/RegistryRepositoryPostgresIT.java

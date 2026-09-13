@@ -15,7 +15,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>17</maven.compiler.release>
     <spring-boot.version>2.7.18</spring-boot.version>
-    <testcontainers.version>1.19.8</testcontainers.version>
+    <testcontainers.version>1.21.3</testcontainers.version>
     <pact.version>4.6.14</pact.version>
   </properties>
 
@@ -195,6 +195,11 @@
             <goals>
               <goal>prepare-agent-integration</goal>
             </goals>
+            <configuration>
+              <!-- Escribe en el MISMO archivo que las unitarias, sin sobrescribirlo -->
+              <destFile>${project.build.directory}/jacoco.exec</destFile>
+              <append>true</append>
+            </configuration>
           </execution>
           <execution>
             <id>report-integration</id>
@@ -202,6 +207,10 @@
             <goals>
               <goal>report-integration</goal>
             </goals>
+            <configuration>
+              <!-- Lee el archivo combinado (unitarias + integración) -->
+              <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+            </configuration>
           </execution>
         </executions>
       </plugin>

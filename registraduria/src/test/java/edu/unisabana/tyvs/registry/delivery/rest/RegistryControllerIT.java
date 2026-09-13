@@ -61,6 +61,16 @@ public class RegistryControllerIT {
         assertEquals(HttpStatus.OK, resp.getStatusCode());
         assertEquals("VALID", resp.getBody());
     }
+    @Test
+    public void shouldReturnBadRequestWhenJsonIsMalformed() {
+        // JSON incompleto/roto a propósito: falta cerrar la llave
+        String jsonRoto = "{\"name\":\"Eva\",\"id\":105,\"age\":30,\"gender\":\"FEMALE\",\"alive\":true";
+
+        ResponseEntity<String> resp = register(jsonRoto);
+
+        assertEquals(HttpStatus.BAD_REQUEST, resp.getStatusCode());
+        assertEquals("MALFORMED_JSON", resp.getBody());
+    }
 
     @Test
     public void shouldReturnDuplicatedWhenIdAlreadyRegistered() {

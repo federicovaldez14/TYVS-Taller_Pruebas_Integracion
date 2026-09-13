@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: edu.unisabana.tyvs.registry.delivery.rest.RegistryControllerIT
+-------------------------------------------------------------------------------
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.484 s -- in edu.unisabana.tyvs.registry.delivery.rest.RegistryControllerIT

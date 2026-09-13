@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CertificadoService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">registraduria</a> &gt; <a href="index.source.html" class="el_package">edu.unisabana.tyvs.certificados</a> &gt; <span class="el_source">CertificadoService.java</span></div><h1>CertificadoService.java</h1><pre class="source lang-java linenums">package edu.unisabana.tyvs.certificados;
+
+/**
+ * Caso de uso del SERVICIO DE CERTIFICADOS: emitir el certificado electoral
+ * de una persona, pero solo si la Registraduria la acepto como votante valida.
+ *
+ * Este servicio no sabe nada de bases de datos ni de las reglas de la
+ * Registraduria: solo conoce su CONTRATO HTTP. Si la Registraduria cambiara
+ * ese contrato (por ejemplo, devolviendo {&quot;resultado&quot;:&quot;VALID&quot;} en vez de texto
+ * plano), este servicio se romperia en produccion sin que ninguna prueba del
+ * proveedor se entere. Eso es exactamente lo que el contract testing previene.
+ */
+public class CertificadoService {
+
+    private final RegistraduriaClient registraduria;
+
+<span class="fc" id="L17">    public CertificadoService(RegistraduriaClient registraduria) {</span>
+<span class="fc" id="L18">        this.registraduria = registraduria;</span>
+<span class="fc" id="L19">    }</span>
+
+    /**
+     * @return el numero de certificado si la persona es votante valida,
+     *         o null si la Registraduria la rechazo.
+     */
+    public String emitirCertificado(int id, String nombre, int edad, String genero, boolean vivo) {
+<span class="fc" id="L26">        String resultado = registraduria.registrarVotante(id, nombre, edad, genero, vivo);</span>
+
+<span class="fc bfc" id="L28" title="All 2 branches covered.">        if (!&quot;VALID&quot;.equals(resultado)) {</span>
+<span class="fc" id="L29">            return null;</span>
+        }
+<span class="fc" id="L31">        return &quot;CERT-&quot; + id;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

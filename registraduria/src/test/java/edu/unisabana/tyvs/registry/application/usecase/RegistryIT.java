@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -74,5 +75,107 @@ public class RegistryIT {
 
         // Assert: la unicidad la garantiza la base de datos, no el mock
         assertEquals(RegisterResult.DUPLICATED, result2);
+    }
+
+    /**
+     * Caso de prueba: menor de edad.
+     *
+     * <p>A diferencia de {@link RegistryWithMockTest}, aqui no basta con
+     * revisar el valor devuelto: hay que confirmar contra la BD real que
+     * NINGUN registro quedo insertado, porque el caso de uso debe rechazar
+     * al menor antes de tocar el repositorio.</p>
+     */
+    @Test
+    public void shouldRejectUnderagePersonAndNotPersistIt() throws Exception {
+        // Arrange
+        Person menor = new Person("Sara", 200, 17, Gender.FEMALE, true);
+
+        // Act
+        RegisterResult result = registry.registerVoter(menor);
+
+        // Assert: resultado de dominio Y ausencia real en la base de datos
+        assertEquals(RegisterResult.UNDERAGE, result);
+        assertFalse(repo.existsById(200));
+    }
+
+    /**
+     * Caso de prueba: edad imposible (negativa).
+     *
+     * <p>Corresponde al Defecto 01 documentado en {@code defectos.md}: una
+     * edad de -1 es un dato IMPOSIBLE, distinto de ser menor de edad. Se
+     * verifica ademas que, igual que con UNDERAGE, no se persiste nada.</p>
+     */
+    @Test
+    public void shouldRejectImpossibleAgeAndNotPersistIt() throws Exception {
+        // Arrange
+        Person edadImposible = new Person("Imposible", 201, -1, Gender.UNIDENTIFIED, true);
+
+        // Act
+        RegisterResult result = registry.registerVoter(edadImposible);
+
+        // Assert
+        assertEquals(RegisterResult.INVALID_AGE, result);
+        assertFalse(repo.existsById(201));
+    }
+
+    /**
+     * Caso de prueba: edad por encima del maximo biologico (121).
+     *
+     * <p>Misma clase de equivalencia que la edad negativa (INVALID_AGE), pero
+     * en el extremo superior. Se prueba por separado porque ambos bordes de
+     * la frontera deben validarse de forma independiente.</p>
+     */
+    @Test
+    public void shouldRejectAgeAboveBiologicalMaximum() throws Exception {
+        // Arrange
+        Person edadImposible = new Person("Matusalen", 202, 121, Gender.MALE, true);
+
+        // Act
+        RegisterResult result = registry.registerVoter(edadImposible);
+
+        // Assert
+        assertEquals(RegisterResult.INVALID_AGE, result);
+        assertFalse(repo.existsById(202));
+    }
+
+    /**
+     * Caso de prueba: persona fallecida.
+     *
+     * <p>Verifica que {@code alive=false} se rechaza con BD real de por
+     * medio, y que ese rechazo ocurre ANTES de cualquier intento de
+     * persistencia (no queda registro en la tabla).</p>
+     */
+    @Test
+    public void shouldRejectDeadPersonAndNotPersistIt() throws Exception {
+        // Arrange
+        Person fallecido = new Person("Pedro", 203, 50, Gender.MALE, false);
+
+        // Act
+        RegisterResult result = registry.registerVoter(fallecido);
+
+        // Assert
+        assertEquals(RegisterResult.DEAD, result);
+        assertFalse(repo.existsById(203));
+    }
+
+    /**
+     * Caso de prueba: identificador invalido (id <= 0).
+     *
+     * <p>Completa las clases de equivalencia de entrada invalida exigidas
+     * por el taller. Un id de 0 o negativo no corresponde a ningun
+     * documento real, y el caso de uso debe rechazarlo sin consultar la
+     * base de datos.</p>
+     */
+    @Test
+    public void shouldRejectNonPositiveIdAndNotPersistIt() throws Exception {
+        // Arrange
+        Person idInvalido = new Person("Nadie", 0, 30, Gender.UNIDENTIFIED, true);
+
+        // Act
+        RegisterResult result = registry.registerVoter(idInvalido);
+
+        // Assert
+        assertEquals(RegisterResult.INVALID, result);
+        assertFalse(repo.existsById(0));
     }
 }

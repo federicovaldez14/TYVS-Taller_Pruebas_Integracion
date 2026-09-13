@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RegistraduriaClient.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">registraduria</a> &gt; <a href="index.source.html" class="el_package">edu.unisabana.tyvs.certificados</a> &gt; <span class="el_source">RegistraduriaClient.java</span></div><h1>RegistraduriaClient.java</h1><pre class="source lang-java linenums">package edu.unisabana.tyvs.certificados;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+
+/**
+ * Cliente HTTP del servicio de Registraduria, visto desde el SERVICIO DE
+ * CERTIFICADOS.
+ *
+ * Este es el CONSUMIDOR del contrato. En un proyecto real viviria en su propio
+ * repositorio y su propio despliegue; aqui convive con el proveedor solo para
+ * que el taller quepa en un proyecto.
+ *
+ * Lo unico que le importa a este consumidor del proveedor es:
+ *   - que exista POST /register
+ *   - que acepte un JSON con name, id, age, gender, alive
+ *   - que responda 200 con el texto del resultado
+ *
+ * Eso, y nada mas que eso, es el contrato.
+ */
+public class RegistraduriaClient {
+
+    private final String baseUrl;
+    private final RestTemplate rest;
+
+    public RegistraduriaClient(String baseUrl) {
+<span class="fc" id="L30">        this(baseUrl, new RestTemplate());</span>
+<span class="fc" id="L31">    }</span>
+
+<span class="fc" id="L33">    public RegistraduriaClient(String baseUrl, RestTemplate rest) {</span>
+<span class="fc" id="L34">        this.baseUrl = baseUrl;</span>
+<span class="fc" id="L35">        this.rest = rest;</span>
+<span class="fc" id="L36">    }</span>
+
+    /**
+     * Registra a un votante y devuelve el resultado tal como lo reporta la
+     * Registraduria (&quot;VALID&quot;, &quot;DUPLICATED&quot;, &quot;UNDERAGE&quot;, &quot;INVALID_AGE&quot;, &quot;DEAD&quot;, &quot;INVALID&quot;).
+     */
+    public String registrarVotante(int id, String nombre, int edad, String genero, boolean vivo) {
+<span class="fc" id="L43">        String json = String.format(</span>
+                &quot;{\&quot;name\&quot;:\&quot;%s\&quot;,\&quot;id\&quot;:%d,\&quot;age\&quot;:%d,\&quot;gender\&quot;:\&quot;%s\&quot;,\&quot;alive\&quot;:%b}&quot;,
+<span class="fc" id="L45">                nombre, id, edad, genero, vivo);</span>
+
+<span class="fc" id="L47">        HttpHeaders headers = new HttpHeaders();</span>
+<span class="fc" id="L48">        headers.setContentType(MediaType.APPLICATION_JSON);</span>
+
+<span class="fc" id="L50">        ResponseEntity&lt;String&gt; resp =</span>
+<span class="fc" id="L51">                rest.postForEntity(baseUrl + &quot;/register&quot;, new HttpEntity&lt;&gt;(json, headers), String.class);</span>
+
+<span class="fc" id="L53">        return resp.getBody();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

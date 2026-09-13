@@ -1,0 +1,15 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+registraduria,edu.unisabana.tyvs.registry.infrastructure.persistence,RegistryRecord,27,0,0,0,10,0,5,0,5,0
+registraduria,edu.unisabana.tyvs.registry.infrastructure.persistence,RegistryRepository,59,111,8,0,16,32,5,7,1,7
+registraduria,edu.unisabana.tyvs.registry.delivery.rest,RegistryExceptionHandler,5,11,0,0,1,3,1,3,1,3
+registraduria,edu.unisabana.tyvs.registry.delivery.rest,RegistryController,0,29,0,0,0,7,0,2,0,2
+registraduria,edu.unisabana.tyvs.registry.domain.model,Gender,0,21,0,0,0,2,0,1,0,1
+registraduria,edu.unisabana.tyvs.registry.domain.model,Person,3,30,0,0,1,11,1,5,1,5
+registraduria,edu.unisabana.tyvs.registry.domain.model,RegisterResult,0,39,0,0,0,7,0,1,0,1
+registraduria,edu.unisabana.tyvs.registry,RegistryApplication,5,3,0,0,2,1,1,1,1,1
+registraduria,edu.unisabana.tyvs.registry.config,RegistryConfig,0,17,0,0,0,5,0,3,0,3
+registraduria,edu.unisabana.tyvs.registry.domain.model.rq,PersonDTO,18,38,0,0,7,17,1,11,1,11
+registraduria,edu.unisabana.tyvs.certificados,CertificadoService,0,24,0,2,0,7,0,3,0,2
+registraduria,edu.unisabana.tyvs.certificados,RegistraduriaClient,0,70,0,0,0,13,0,3,0,3
+registraduria,edu.unisabana.tyvs.registry.application.usecase,Registry,0,63,0,14,0,19,0,9,0,2
+registraduria,edu.unisabana.tyvs.registry.application.usecase,RegistryPersistenceException,0,5,0,0,0,2,0,1,0,1

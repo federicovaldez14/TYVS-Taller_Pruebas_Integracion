@@ -72,6 +72,7 @@ class RegistryRepositoryPostgresIT {
         try {
             return DockerClientFactory.instance().isDockerAvailable();
         } catch (Throwable t) {
+            t.printStackTrace();
             return false;
         }
     }
