@@ -1,10 +1,5 @@
 # Registro de Defectos — Taller de Pruebas de Integración y Sistema
 
-> Este documento sigue el formato de `defectos_template.md`. El archivo
-> `defectos.md` original del profesor (marcado "EJEMPLO RESUELTO") se
-> conserva como referencia pedagógica; este es el registro propio del
-> equipo, obtenido al ejecutar la suite de pruebas del proyecto.
-
 ---
 
 ## Formato 1: Lista detallada (narrativa)
